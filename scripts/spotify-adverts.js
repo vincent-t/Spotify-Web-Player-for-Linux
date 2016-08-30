@@ -11,7 +11,7 @@ var CSS = `
 :not(#advert) > #hpto-container{display:none;}
 #now-playing-widgets{display:none !important;}
 .etched-top::before{background-color:#343434 !important;}
-html, body{width: 100%;height:100%;border:0;margin:0;padding:0;}
+html, body{width: 100%;height:100%;border:0 !important;margin:0;padding:0;}
 .ads-leaderboard-container{display:none !important;}
 #window_advert{position: fixed; display:none;height:100%;width:100%;background:rgba(0,0,0,0.75);z-index:10000}
 #window_advert_container{display:table;position:relative;width:100%;height:100%}
@@ -21,65 +21,69 @@ html, body{width: 100%;height:100%;border:0;margin:0;padding:0;}
 #advert #hpto-container .hpto-button{background:rgba(0,0,0,0.75);padding:5px;display:inline-block;border-radius:5px;margin:10px;}
 #advert #hpto-container{position:relative;height:100%;width:100%}
 `,
-currentWindowAdvert = null;
+    currentWindowAdvert = null;
 
-function injectIframe(obj){
+function injectIframe(obj) {
     //Get the iframe
     var iframe = jQuery(obj);
     //Append it to the iframe
     jQuery('body', jQuery(iframe).contents()).append("<style>" + CSS + "<style>");
+    //Always make sure spotify player controls are covering advert area
+    //$('html, body', $('#app-player').contents()).css({height: '100%', 'border-bottom': 'none'});
 }
-function showWindowAdvert(){
-	if(jQuery('#window_advert').length > 0) jQuery('#window_advert').remove();
-	var newWindowAdvert = $("#hpto-container", jQuery('.root iframe').contents());
-	console.log("%s \n %s", newWindowAdvert.length, currentWindowAdvert);
-	if (newWindowAdvert.length == 0 && currentWindowAdvert == null || $('#login').is(":visible")) return;
-	currentWindowAdvert = $((newWindowAdvert.length == 0 ? currentWindowAdvert : newWindowAdvert.eq(0))).clone();
-	$(currentWindowAdvert).css("background-position", "center");
-	//currentWindowAdvert.children('.hpto-interactive').remove();
-	jQuery('body #wrapper').prepend(advertHTML);
-	//Add the new advert
-	jQuery('#window_advert_container #advert').append(currentWindowAdvert);
-	//Add the advert link
-	$('#window_advert_container #advert').append("<a href='" + currentWindowAdvert.attr('data-url') + "' target='_blank'></a>");
-	jQuery('#window_advert').fadeToggle();
+
+function showWindowAdvert() {
+    if (jQuery('#window_advert').length > 0) jQuery('#window_advert').remove();
+    var newWindowAdvert = $("#hpto-container", jQuery('.root iframe').contents());
+    console.log("%s \n %s", newWindowAdvert.length, currentWindowAdvert);
+    if (newWindowAdvert.length == 0 && currentWindowAdvert == null || $('#login').is(":visible")) return;
+    currentWindowAdvert = $((newWindowAdvert.length == 0 ? currentWindowAdvert : newWindowAdvert.eq(0))).clone();
+    $(currentWindowAdvert).css("background-position", "center");
+    //currentWindowAdvert.children('.hpto-interactive').remove();
+    jQuery('body #wrapper').prepend(advertHTML);
+    //Add the new advert
+    jQuery('#window_advert_container #advert').append(currentWindowAdvert);
+    //Add the advert link
+    $('#window_advert_container #advert').append("<a href='" + currentWindowAdvert.attr('data-url') + "' target='_blank'></a>");
+    jQuery('#window_advert').fadeToggle();
 }
-function hideWindowAdvert(e){
-  if(jQuery('#window_advert').is(':visible')){
-	  jQuery('#window_advert').fadeToggle();
-	  jQuery('#window_advert').remove();
-  }
-  return false;
+
+function hideWindowAdvert(e) {
+    if (jQuery('#window_advert').is(':visible')) {
+        jQuery('#window_advert').fadeToggle();
+        jQuery('#window_advert').remove();
+    }
+    return false;
 }
 
 jQuery('body').prepend("<style class='CSS_Inject'>" + CSS + "</style>");
 var window_focus = true;
-document.addEventListener("visibilitychange", function(){
-	window_focus = document.visibilityState == "visible";
-	if(!window_focus){
-		console.log("Window is minimized.");
-		setTimeout(function(){
-			if(!window_focus && !$('#window_advert').is(":visible")) showWindowAdvert();
-		}, 2e4);
-	} else {
-		console.log("Window is in focus.");
-		if($('#window_advert').is(":visible")) { 
-			setTimeout(function(){
-				if(window_focus && $('#window_advert').is(":visible")) $('#window_advert').click(hideWindowAdvert); 
-			}, 500);
-		}
-	}
+document.addEventListener("visibilitychange", function() {
+    window_focus = document.visibilityState == "visible";
+    if (!window_focus) {
+        console.log("Window is minimized.");
+        setTimeout(function() {
+            if (!window_focus && !$('#window_advert').is(":visible")) showWindowAdvert();
+        }, 2e4);
+    } else {
+        console.log("Window is in focus.");
+        if ($('#window_advert').is(":visible")) {
+            setTimeout(function() {
+                if (window_focus && $('#window_advert').is(":visible")) $('#window_advert').click(hideWindowAdvert);
+            }, 500);
+        }
+    }
 }, false);
 
 //Listening for the adverts to appear
-window.addEventListener("message", function(event){
+window.addEventListener("message", function(event) {
     //Check if the result is JSON
-    if(event.data.indexOf("user:impression") > 0){
+    if (event.data.indexOf("user:impression") > 0) {
         //console.log("injected advert redirect");
         var newWindowAdvert = $("#hpto-container", jQuery('.root iframe').contents());
-        if(currentWindowAdvert == null && newWindowAdvert.length > 0) currentWindowAdvert = newWindowAdvert.eq(0).clone();
-        injectIframe(jQuery("div[id*='section-'] iframe[id*='app-spotify:']"));
+        if (currentWindowAdvert == null && newWindowAdvert.length > 0) currentWindowAdvert = newWindowAdvert.eq(0).clone();
+        injectIframe(jQuery("div[id*='section-'] iframe[id*='app-spotify:'], #app-player"));
     } else {
-    	//console.log(event.data);
+        //console.log(event.data);
     }
 }, false);

@@ -4,7 +4,7 @@ A Node.JS application built with electron to turn Spotify's Web Player into a lo
 
 ## Includes
 * Notifications
-* Tray Icon 
+* Tray Icon
 * Facebook Login (it was broken :( )
 * Unity Right-Click menu integration
 * D-Bus mpris control/update info
@@ -19,9 +19,7 @@ A Node.JS application built with electron to turn Spotify's Web Player into a lo
 * Off-line playback support
 * Media keys
 
-
 ## How to install
-
 Check out the [Releases](https://github.com/Quacky2200/Spotify-Web-Player-for-Linux/releases) page.
 
 ## Requirements
@@ -29,4 +27,5 @@ libappindicator1, wget, unzip
 
 #### For development:
 **(Optional)** Node.JS
-Electron 0.37.0 found here: https://github.com/electron/electron/releases/
+Electron 0.37.8 found here: https://github.com/electron/electron/releases/
+libdbus-1-dev libglib2.0-dev libexpat1-dev
