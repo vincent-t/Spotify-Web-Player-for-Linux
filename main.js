@@ -17,7 +17,7 @@ global.props = {
     os: os,
     electron: electron,
     mpris: null, //require('mpris-service'),
-    APP_ICON: __dirname + '/spotify-large-transparent.png',
+    APP_ICON: __dirname + '/icon.png',
     userhome: userhome,
     APP_DIR: userhome('.spotifywebplayer'),
     HOST: 'https://play.spotify.com',
