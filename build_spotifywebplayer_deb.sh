@@ -34,9 +34,12 @@ mv "$PACKAGENAME/opt/$PACKAGENAME/electron" "$PACKAGENAME/opt/$PACKAGENAME/spoti
 mkdir -p "$PACKAGENAME/opt/$PACKAGENAME/resources/app"
 
 #Get application
-wget -nc -O - "https://github.com/vincent-t/Spotify-Web-Player-for-Linux/archive/master.tar.gz" | tar -xvzf - -C "$PACKAGENAME/opt/$PACKAGENAME/resources/app" --strip-components=1 --exclude='package.json' --exclude='README.md' --exclude='make_release.sh' --exclude='spotifywebplayer.sh' --exclude='run.js' --exclude='.gitignore' --exclude='plugins_ia32'
+wget -nc -O - "https://github.com/vincent-t/Spotify-Web-Player-for-Linux/archive/master.tar.gz" | tar -xvzf - -C "$PACKAGENAME/opt/$PACKAGENAME/resources/app" --strip-components=1 --exclude='README.md' --exclude='make_release.sh' --exclude='spotifywebplayer.sh' --exclude='run.js' --exclude='.gitignore' --exclude='plugins_ia32'
 
-mv "$PACKAGENAME/opt/$PACKAGENAME/resources/app/icon.png" "$PACKAGENAME/usr/share/pixmaps/spotifywebplayer.png"
+#Rename plugin dir
+mv "$PACKAGENAME/opt/$PACKAGENAME/plugins_x64" "$PACKAGENAME/opt/$PACKAGENAME/plugins"
+
+cp "$PACKAGENAME/opt/$PACKAGENAME/resources/app/icon.png" "$PACKAGENAME/usr/share/pixmaps/spotifywebplayer.png"
 
 tee "$PACKAGENAME/usr/share/applications/spotifywebplayer.desktop" << 'EOF'
 [Desktop Entry]
@@ -84,17 +87,18 @@ rm -rf "node_modules/.bin"
 popd
 rmdir "$PACKAGENAME/opt/$PACKAGENAME/resources/app/etc"
 
-# Create run script
-var=$1
+#Create run script
+#TODO: should be /opt/$PACKAGENAME/spotifywebplayer "$1"
 tee "$PACKAGENAME/usr/bin/spotifywebplayer" << EOF
 #!/bin/bash
-/opt/$PACKAGENAME/spotifywebplayer $var
+/opt/$PACKAGENAME/spotifywebplayer
 EOF
 chmod 755 "$PACKAGENAME/usr/bin/spotifywebplayer"
 
 PACKAGESIZE=`du -c $PACKAGENAME | egrep -i 'total|insgesamt' | cut -f1`
 
 mkdir $PACKAGENAME/DEBIAN
+#NOTE: Other options
 #Architecture: all
 #Architecture: i386
 #Depends: libappindicator, libnotify4, notify-osd, wget, unzip
@@ -106,7 +110,7 @@ Version: $VERSION
 Architecture: amd64
 Maintainer: $MAINTAINER <$EMAIL>
 Installed-Size: $PACKAGESIZE
-Depends: libappindicator, libnotify4, notify-osd
+Depends: libappindicator1, libnotify4, notify-osd
 Section: base
 Priority: optional
 Homepage: https://github.com/Quacky2200/Spotify-Web-Player-for-Linux
