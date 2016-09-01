@@ -25,7 +25,7 @@ mkdir -p "$PACKAGENAME/opt/$PACKAGENAME"
 
 #Get electron
 wget -nc -O tmp.zip "$ELECTRON"
-unzip tmp.zip -x "default_app.asar" -d "$PACKAGENAME/opt/$PACKAGENAME"
+unzip tmp.zip -x \*default_app.asar\* -d "$PACKAGENAME/opt/$PACKAGENAME"
 rm tmp.zip
 
 #Rename binary
@@ -34,10 +34,10 @@ mv "$PACKAGENAME/opt/$PACKAGENAME/electron" "$PACKAGENAME/opt/$PACKAGENAME/spoti
 mkdir -p "$PACKAGENAME/opt/$PACKAGENAME/resources/app"
 
 #Get application
-wget -nc -O - "https://github.com/vincent-t/Spotify-Web-Player-for-Linux/archive/master.tar.gz" | tar -xvzf - -C "$PACKAGENAME/opt/$PACKAGENAME/resources/app" --strip-components=1 --exclude='README.md' --exclude='make_release.sh' --exclude='spotifywebplayer.sh' --exclude='run.js' --exclude='.gitignore' --exclude='plugins_ia32'
+wget -nc -O - "https://github.com/vincent-t/Spotify-Web-Player-for-Linux/archive/master.tar.gz" | tar -xvzf - -C "$PACKAGENAME/opt/$PACKAGENAME/resources/app" --strip-components=1 --exclude='README.md' --exclude='build_spotifywebplayer_deb.sh' --exclude='spotifywebplayer.sh' --exclude='run.js' --exclude='.gitignore' --exclude='plugins_ia32'
 
 #Rename plugin dir
-mv "$PACKAGENAME/opt/$PACKAGENAME/plugins_x64" "$PACKAGENAME/opt/$PACKAGENAME/plugins"
+mv "$PACKAGENAME/opt/$PACKAGENAME/resources/app/plugins_x64" "$PACKAGENAME/opt/$PACKAGENAME/resources/app/plugins"
 
 cp "$PACKAGENAME/opt/$PACKAGENAME/resources/app/icon.png" "$PACKAGENAME/usr/share/pixmaps/spotifywebplayer.png"
 
