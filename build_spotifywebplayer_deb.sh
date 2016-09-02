@@ -45,18 +45,18 @@ tee "$PACKAGENAME/usr/share/applications/spotifywebplayer.desktop" << 'EOF'
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Spotify
-GenericName=Spotify Web Player
-Comment=Music for every moment. Spotify is a digital music service that gives you access to millions of songs.
-Exec=spotifywebplayer %u
+Name=Spotify Web Player
+GenericName=Spotify
+Comment=A minimal Electron application which wraps Spotify Web Player into an application.
 Icon=spotifywebplayer
+Categories=AudioVideo;Audio;Player;GTK;
+Exec=spotifywebplayer %U
+TryExec=spotifywebplayer
 Terminal=false
-StartupNotify=false
-Categories=GNOME;AudioVideo;Player;GTK;Audio;
 StartupWMClass=Spotify
-Actions=Play;Pause;Next;Previous;
+Actions=PlayPause;Next;Previous
 
-[Desktop Action Play]
+[Desktop Action PlayPause]
 Name=Play/Pause
 Exec=dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotifywebplayer /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause
 
