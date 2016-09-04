@@ -73,8 +73,11 @@ npm install --prefix "$PACKAGENAME/opt/$PACKAGENAME/resources/app" mpris-service
 ./$PACKAGENAME/opt/$PACKAGENAME/resources/app/node_modules/.bin/electron-rebuild -v $ELECTRON_VER #-n $_NODE_VER
 npm install --prefix "$PACKAGENAME/opt/$PACKAGENAME/resources/app" request
 ./$PACKAGENAME/opt/$PACKAGENAME/resources/app/node_modules/.bin/electron-rebuild -v $ELECTRON_VER #-n $_NODE_VER
+npm install --prefix "$PACKAGENAME/opt/$PACKAGENAME/resources/app" extend
+./$PACKAGENAME/opt/$PACKAGENAME/resources/app/node_modules/.bin/electron-rebuild -v $ELECTRON_VER #-n $_NODE_VER
+
 pushd "$PACKAGENAME/opt/$PACKAGENAME/resources/app"
-rm -rf $(ls -Ad node_modules/* | grep -Ev '^node_modules/auto-launch$|^node_modules/electron-cookies$|^node_modules/freedesktop-notifications$|^node_modules/mpris-service$|^node_modules/request$')
+rm -rf $(ls -Ad node_modules/* | grep -Ev '^node_modules/auto-launch$|^node_modules/electron-cookies$|^node_modules/freedesktop-notifications$|^node_modules/mpris-service$|^node_modules/request$|^node_modules/extend$')
 rm -rf "node_modules/.bin"
 popd
 rmdir "$PACKAGENAME/opt/$PACKAGENAME/resources/app/etc"

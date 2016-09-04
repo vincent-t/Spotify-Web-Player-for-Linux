@@ -4,12 +4,12 @@
  */
 var child_process = require('child_process');
 var spawn = child_process.spawn;
-var lib_node = process.cwd() + '/libs/node/bin/node';
+var lib_node = '/usr/bin/node';//process.cwd() + '/libs/node/bin/node';
 const interpreter = require('./dbus_interpreter');
 let dbus = spawnDBus();
 
 function spawnDBus(){
-    var spawned = spawn(lib_node, [__dirname + '/dbus_service.js']);
+    var spawned = spawn(lib_node, ['--use_strict', __dirname + '/dbus_service.js']);
     spawned.stderr.on('data', (data) => {
         console.log('D-Bus Error: ' + data.toString())
     });

@@ -29,6 +29,8 @@
     "electron-cookies": "^1.1.0",
     "freedesktop-notifications": "^1.2.2",
     "mpris-service": "^1.1.1",
-    "request": "^2.74.0"
+    "request": "^2.74.0",
+    "extend": "^3.0.0"
+
   }
 }
