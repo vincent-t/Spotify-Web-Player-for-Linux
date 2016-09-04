@@ -15,7 +15,7 @@ if (window.opener) {
 document.onreadystatechange = function() {
     document.body.style.backgroundColor = "#121314";
     //Load jQuery
-    window.$ = window.jQuery = require('./jquery');
+    window.$ = window.jQuery = require('./jquery-3.1.0.min.js');
     //If we've logged in and the login screen is still present
     if (window.location.href.indexOf("?electron_logged_in=true") > 0 && $('#login').is(":visible")) {
         $('body').prepend('<style>body.login{opacity: 0;}</style>');

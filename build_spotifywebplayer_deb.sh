@@ -53,7 +53,7 @@ Categories=AudioVideo;Audio;Player;GTK;
 Exec=spotifywebplayer %U
 TryExec=spotifywebplayer
 Terminal=false
-StartupWMClass=Spotify
+StartupWMClass=Spotify Web Player
 Actions=PlayPause;Next;Previous
 
 [Desktop Action PlayPause]
@@ -114,7 +114,7 @@ Depends: libappindicator1, libnotify4, notify-osd
 Section: base
 Priority: optional
 Homepage: https://github.com/Quacky2200/Spotify-Web-Player-for-Linux
-Description: spotifywebplayer
+Description: Spotify Web Player
  A minimal Electron application which wraps Spotify Web Player into an application.
 EOF
 
