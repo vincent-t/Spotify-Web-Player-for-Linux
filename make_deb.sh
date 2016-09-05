@@ -73,11 +73,9 @@ npm install --prefix "$PACKAGENAME/opt/$PACKAGENAME/resources/app" mpris-service
 ./$PACKAGENAME/opt/$PACKAGENAME/resources/app/node_modules/.bin/electron-rebuild -v $ELECTRON_VER #-n $_NODE_VER
 npm install --prefix "$PACKAGENAME/opt/$PACKAGENAME/resources/app" request
 ./$PACKAGENAME/opt/$PACKAGENAME/resources/app/node_modules/.bin/electron-rebuild -v $ELECTRON_VER #-n $_NODE_VER
-npm install --prefix "$PACKAGENAME/opt/$PACKAGENAME/resources/app" extend
-./$PACKAGENAME/opt/$PACKAGENAME/resources/app/node_modules/.bin/electron-rebuild -v $ELECTRON_VER #-n $_NODE_VER
 
 pushd "$PACKAGENAME/opt/$PACKAGENAME/resources/app"
-rm -rf $(ls -Ad node_modules/* | grep -Ev '^node_modules/auto-launch$|^node_modules/electron-cookies$|^node_modules/freedesktop-notifications$|^node_modules/mpris-service$|^node_modules/request$|^node_modules/extend$')
+#rm -rf $(ls -Ad node_modules/* | grep -Ev '^node_modules/auto-launch$|^node_modules/electron-cookies$|^node_modules/freedesktop-notifications$|^node_modules/mpris-service$|^node_modules/request$|^node_modules/extend$')
 rm -rf "node_modules/.bin"
 popd
 rmdir "$PACKAGENAME/opt/$PACKAGENAME/resources/app/etc"
@@ -113,11 +111,6 @@ Description: Spotify Web Player
  A minimal Electron application which wraps Spotify Web Player into an application.
 EOF
 
-tee "$PACKAGENAME/DEBIAN/prerm" << EOF
-killall -q spotifywebplayer
-EOF
-
-chmod 0755 "$PACKAGENAME/DEBIAN/prerm"
 chmod 0644 "$PACKAGENAME/DEBIAN/control"
 
 fakeroot dpkg-deb --build $PACKAGENAME
