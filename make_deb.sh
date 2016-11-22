@@ -29,35 +29,37 @@ fi
 echo "Build $PACKAGE_NAME.deb"
 
 #Create folders
-mkdir -p "build/$PACKAGE_NAME/usr/bin" "build/$PACKAGE_NAME/usr/share/pixmaps" "build/$PACKAGE_NAME/usr/share/applications" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/plugins" "build/$PACKAGE_NAME/DEBIAN"
-
-#Get application
-wget -O - "https://github.com/vincent-t/Spotify-Web-Player-for-Linux/archive/master.tar.gz" | tar -xvzf - -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" --strip-components=1 --exclude='.gitignore' --exclude='LICENSE' --exclude='make_deb.sh' --exclude='package.json' --exclude='README.md'
+mkdir -p "build/$PACKAGE_NAME/usr/share/pixmaps" "build/$PACKAGE_NAME/usr/share/applications" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" "build/$PACKAGE_NAME/DEBIAN"
 
 #Get electron
 wget -O "$ELECTRON_TMPFILE" "$ELECTRON_LINK"
-unzip "$ELECTRON_TMPFILE" -x \*default_app.asar\* -d "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron"
+unzip "$ELECTRON_TMPFILE" -x \*default_app.asar\* -d "build/$PACKAGE_NAME/opt/$PACKAGE_NAME"
 rm "$ELECTRON_TMPFILE"
 #Rename binary
-mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron/electron" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron/spotifywebplayer"
+mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/electron" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/spotifywebplayer"
+
+#Get application
+mkdir -p "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app"
+wget -O - "https://github.com/vincent-t/Spotify-Web-Player-for-Linux/archive/master.tar.gz" | tar -xvzf - -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app" --strip-components=1 --exclude='.gitignore' --exclude='LICENSE' --exclude='make_deb.sh' --exclude='package.json' --exclude='README.md'
 
 #Get node
 wget -O "$NODE_TMPFILE" "$NODE_LINK"
-tar -xf "$NODE_TMPFILE" -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs" --exclude='CHANGELOG.md' --exclude='LICENSE' --exclude='README.md'
+tar -xf "$NODE_TMPFILE" -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app" --exclude='CHANGELOG.md' --exclude='LICENSE' --exclude='README.md'
 if [ "$(uname -m)" = "x86_64" ]; then
-	mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node-v$NODE_VER-linux-x64" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node"
+	mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node-v$NODE_VER-linux-x64" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node"
 else
-	mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node-v$NODE_VER-linux-x86" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node"
+	mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node-v$NODE_VER-linux-x86" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node"
 fi
 rm "$NODE_TMPFILE"
 
 #Get flashplugin
+mkdir -p "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/plugins"
 wget -O "$FLASH_TMPFILE" "$FLASH_LINK"
-tar -xf "$FLASH_TMPFILE" -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/plugins" --exclude='LGPL' --exclude='manifest.json' --exclude='README'
+tar -xf "$FLASH_TMPFILE" -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/plugins" --exclude='LGPL' --exclude='manifest.json' --exclude='README'
 rm "$FLASH_TMPFILE"
 
 #Copy Icon
-cp "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/icons/spotify.png" "build/$PACKAGE_NAME/usr/share/pixmaps/spotifywebplayer.png"
+cp "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/icons/spotify.png" "build/$PACKAGE_NAME/usr/share/pixmaps/spotifywebplayer.png"
 
 tee "build/$PACKAGE_NAME/usr/share/applications/spotifywebplayer.desktop" << 'EOF'
 [Desktop Entry]
@@ -69,7 +71,6 @@ Comment=A minimal Electron application which wraps Spotify Web Player into an ap
 Icon=spotifywebplayer
 Categories=GNOME;GTK;AudioVideo;Audio;Player;
 Exec=spotifywebplayer %U
-TryExec=spotifywebplayer
 Terminal=false
 StartupWMClass=Spotify Web Player
 Actions=PlayPause;Next;Previous
@@ -121,7 +122,7 @@ rmdir "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/etc"
 #Create run script
 tee "build/$PACKAGE_NAME/usr/bin/spotifywebplayer" << EOF
 #!/bin/bash
-/opt/$PACKAGE_NAME/libs/electron/spotifywebplayer ../.. "\$1"
+/opt/$PACKAGE_NAME/spotifywebplayer "\$1"
 EOF
 
 chmod 755 "build/$PACKAGE_NAME/usr/bin/spotifywebplayer"

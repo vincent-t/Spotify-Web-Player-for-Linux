@@ -22,7 +22,7 @@ class Controller extends EventEmitter {
 			if(this.status !== 'Playing') this.playPause();
 		}
 		this.playPause = () => {
-			//API doesn't control adverts... SpotifyApi.api.request('player_pause', [this.player_id]); 
+			//API doesn't control adverts... SpotifyApi.api.request('player_pause', [this.player_id]);
 			$('button#play-pause', $('iframe#app-player').contents()).click();
 		}
 		this.pause = () => {
@@ -53,8 +53,8 @@ class Controller extends EventEmitter {
 		var dbus = process.platform == 'linux';
 
 		const LIBNODE = [
-			'/usr/bin/node', 
-			`${process.cwd()}/libs/node/bin/node`
+			'/usr/bin/node',
+			`${process.cwd()}/node/bin/node`
 		];
 		var nodeFound = false;
 		if (dbus){
@@ -86,7 +86,7 @@ class Controller extends EventEmitter {
 						}
 					}
 
-					//Attach DBus interaction 
+					//Attach DBus interaction
 					dbus.interpreter.on('Play', this.play);
 					dbus.interpreter.on('PlayPause', this.playPause);
 					dbus.interpreter.on('Next', this.next);
@@ -122,7 +122,7 @@ class Controller extends EventEmitter {
 				//Suport OS X & Windows with other notification systems
 			} else {
 				new Notification(
-					(this.status == 'Playing' ? 'Now Playing' : this.status), 
+					(this.status == 'Playing' ? 'Now Playing' : this.status),
 					{
 						icon: this.track.art,
 						body: this.track.name + "\n" + this.track.album + "\n" + this.track.artists
@@ -134,7 +134,7 @@ class Controller extends EventEmitter {
 			if(dbus) dbus.stopService();
 		};
 		var update = (details) => {
-			var trackChange, 
+			var trackChange,
 				playbackChange;
 			//If we are listening to a track
 			if(details.track){
@@ -169,7 +169,7 @@ class Controller extends EventEmitter {
 				playbackChange = this.status != currentPlayback;
 				this.status = currentPlayback;
 				this.isAdvertisement = true;
-				this.track.id = null; 
+				this.track.id = null;
 				this.track.discNumber = 1;
 				this.track.trackNumber = 0;
 				this.track.uri = null;
