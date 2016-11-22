@@ -29,33 +29,37 @@ fi
 echo "Build $PACKAGE_NAME.deb"
 
 #Create folders
-mkdir -p "$DIR/build/$PACKAGE_NAME/usr/bin" "$DIR/build/$PACKAGE_NAME/usr/share/pixmaps" "$DIR/build/$PACKAGE_NAME/usr/share/applications" "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron" "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/plugins"
+mkdir -p "build/$PACKAGE_NAME/usr/bin" "build/$PACKAGE_NAME/usr/share/pixmaps" "build/$PACKAGE_NAME/usr/share/applications" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/plugins" "build/$PACKAGE_NAME/DEBIAN"
+
+#Get application
+wget -O - "https://github.com/vincent-t/Spotify-Web-Player-for-Linux/archive/master.tar.gz" | tar -xvzf - -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" --strip-components=1 --exclude='.gitignore' --exclude='LICENSE' --exclude='make_deb.sh' --exclude='package.json' --exclude='README.md'
 
 #Get electron
-wget -nc -O "$ELECTRON_TMPFILE" "$ELECTRON_LINK"
-unzip "$ELECTRON_TMPFILE" -x \*default_app.asar\* -d "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron"
+wget -O "$ELECTRON_TMPFILE" "$ELECTRON_LINK"
+unzip "$ELECTRON_TMPFILE" -x \*default_app.asar\* -d "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron"
 rm "$ELECTRON_TMPFILE"
-
 #Rename binary
-mv "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron/electron" "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron/spotifywebplayer"
+mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron/electron" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/electron/spotifywebplayer"
 
 #Get node
-wget -nc -O "$NODE_TMPFILE" "$NODE_LINK"
-tar -xf "$NODE_TMPFILE" -C "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs"
-mv "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node*" "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node"
+wget -O "$NODE_TMPFILE" "$NODE_LINK"
+tar -xf "$NODE_TMPFILE" -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs" --exclude='CHANGELOG.md' --exclude='LICENSE' --exclude='README.md'
+if [ "$(uname -m)" = "x86_64" ]; then
+	mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node-v$NODE_VER-linux-x64" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node"
+else
+	mv "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node-v$NODE_VER-linux-x86" "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/libs/node"
+fi
 rm "$NODE_TMPFILE"
 
 #Get flashplugin
-wget -nc -O "$FLASH_TMPFILE" "$FLASH_LINK"
-tar -xvzf "$FLASH_TMPFILE" -C "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/plugins" --strip-components=1 --exclude='LGPL' --exclude='manifest.json' --exclude='README'
+wget -O "$FLASH_TMPFILE" "$FLASH_LINK"
+tar -xf "$FLASH_TMPFILE" -C "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/plugins" --exclude='LGPL' --exclude='manifest.json' --exclude='README'
 rm "$FLASH_TMPFILE"
 
-#Get application
-wget -nc -O - "https://github.com/vincent-t/Spotify-Web-Player-for-Linux/archive/master.tar.gz" | tar -xvzf - -C "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" --strip-components=1 --exclude='.gitignore' --exclude='LICENSE' --exclude='make_deb.sh' --exclude='package.json' --exclude='README.md'
+#Copy Icon
+cp "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/icons/spotify.png" "build/$PACKAGE_NAME/usr/share/pixmaps/spotifywebplayer.png"
 
-cp "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/icons/spotify.png" "$DIR/build/$PACKAGE_NAME/usr/share/pixmaps/spotifywebplayer.png"
-
-tee "$DIR/build/$PACKAGE_NAME/usr/share/applications/spotifywebplayer.desktop" << 'EOF'
+tee "build/$PACKAGE_NAME/usr/share/applications/spotifywebplayer.desktop" << 'EOF'
 [Desktop Entry]
 Version=1.0
 Type=Application
@@ -84,47 +88,47 @@ Exec=dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotifywebp
 EOF
 
 #Download and build node modules
-npm install --prefix "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" electron-rebuild --save-dev
+npm install --prefix "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" electron-rebuild --save-dev
 #auto-launch
-npm install --prefix "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" auto-launch
-"./$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
+npm install --prefix "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" auto-launch
+"./build/$PACKAGE_NAME/opt/$PACKAGE_NAME/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
 #dbus
-npm install --prefix "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" dbus
-"./$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
+npm install --prefix "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" dbus
+"./build/$PACKAGE_NAME/opt/$PACKAGE_NAME/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
 #electron-cookies
-npm install --prefix "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" electron-cookies
-"./$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
+npm install --prefix "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" electron-cookies
+"./build/$PACKAGE_NAME/opt/$PACKAGE_NAME/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
 #freedesktop-notifications
-npm install --prefix "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" freedesktop-notifications
-"./$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
+npm install --prefix "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" freedesktop-notifications
+"./build/$PACKAGE_NAME/opt/$PACKAGE_NAME/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
 #mpris-service
-npm install --prefix "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" mpris-service
-"./$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
+npm install --prefix "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" mpris-service
+"./build/$PACKAGE_NAME/opt/$PACKAGE_NAME/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
 #node-unofficialmxm
-npm install --prefix "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" git+https://github.com/Quacky2200/node-unofficialmxm.git
-"./$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
+npm install --prefix "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" git+https://github.com/Quacky2200/node-unofficialmxm.git
+"./build/$PACKAGE_NAME/opt/$PACKAGE_NAME/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
 #request
-npm install --prefix "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME" request
-"./$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/resources/app/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
+npm install --prefix "build/$PACKAGE_NAME/opt/$PACKAGE_NAME" request
+"./build/$PACKAGE_NAME/opt/$PACKAGE_NAME/node_modules/.bin/electron-rebuild" -v "$ELECTRON_VER" #-n "$NODE_VER"
 
-pushd "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME"
+pushd "build/$PACKAGE_NAME/opt/$PACKAGE_NAME"
 rm -rf $(ls -Ad node_modules/* | grep -Ev '^node_modules/auto-launch$|^node_modules/electron-cookies$|^node_modules/dbus$|^node_modules/freedesktop-notifications$|^node_modules/mpris-service$|^node_modules/node-unofficialmxm$|^node_modules/request$')
-rm -rf "node_modules/.bin"
+rm -rf "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/node_modules/.bin"
 popd
 
-rmdir "$DIR/build/$PACKAGE_NAME/opt/$PACKAGE_NAME/etc"
+rmdir "build/$PACKAGE_NAME/opt/$PACKAGE_NAME/etc"
 
 #Create run script
-tee "$DIR/build/$PACKAGE_NAME/usr/bin/spotifywebplayer" << EOF
+tee "build/$PACKAGE_NAME/usr/bin/spotifywebplayer" << EOF
 #!/bin/bash
-/opt/$PACKAGE_NAME/spotifywebplayer "\$1"
+/opt/$PACKAGE_NAME/libs/electron/spotifywebplayer ../.. "\$1"
 EOF
-chmod 755 "$DIR/build/$PACKAGE_NAME/usr/bin/spotifywebplayer"
 
-PACKAGE_SIZE="$(du -c "$DIR/build/$PACKAGE_NAME" | egrep -i 'total|insgesamt' | cut -f1)
+chmod 755 "build/$PACKAGE_NAME/usr/bin/spotifywebplayer"
 
-mkdir "$DIR/build/$PACKAGE_NAME/DEBIAN"
-tee "$DIR/build/$PACKAGE_NAME/DEBIAN/control" << EOF
+PACKAGE_SIZE="$(du -c "build/$PACKAGE_NAME" | egrep -i 'total|insgesamt' | cut -f1)"
+
+tee "build/$PACKAGE_NAME/DEBIAN/control" << EOF
 Package: $PACKAGE_NAME
 Version: $PACKAGE_VERSION
 Architecture: $PACKAGE_ARCHITECTURE
@@ -138,8 +142,8 @@ Description: Spotify Web Player
  A minimal Electron application which wraps Spotify Web Player into an application.
 EOF
 
-chmod 0644 "$DIR/build/$PACKAGE_NAME/DEBIAN/control"
+chmod 644 "build/$PACKAGE_NAME/DEBIAN/control"
 
 fakeroot dpkg-deb --build "$DIR/build/$PACKAGE_NAME"
-rm -rf "$DIR/build/$PACKAGE_NAME"
+#rm -rf "build/$PACKAGE_NAME"
 echo "$PACKAGE_NAME.deb successfully build!"
